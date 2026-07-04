@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pawsonality — Which Animal Matches Your Vibe?</title>
+  <meta name="description" content="A 15-question personality quiz that matches you to your spirit animal, backed by real facts from a live animal data API." />
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header>
+    <nav class="site-nav">
+      <a href="index.html" class="brand">&#x1F43E; Pawsonality</a>
+      <div class="nav-links">
+        <a href="index.html" class="active">Home</a>
+        <a href="quiz.html">Take the Quiz</a>
+        <a href="faq.html">FAQ</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="page-wrap">
+    <section class="hero">
+      <span class="hero-eyebrow">15 questions &middot; 2 minutes &middot; zero science</span>
+      <h1>Which animal matches your vibe?</h1>
+      <p class="lead">
+        Answer honestly (or don't, we're not the personality police) and we'll match you
+        to one of six animal archetypes — then back it up with real facts pulled live
+        from an animal data API.
+      </p>
+      <a class="btn btn-primary" href="quiz.html">Start the Quiz &rarr;</a>
+
+      <div class="archetype-preview">
+        <span class="archetype-chip">&#x1F43A; Wolf</span>
+        <span class="archetype-chip">&#x1F431; Cat</span>
+        <span class="archetype-chip">&#x1F436; Dog</span>
+        <span class="archetype-chip">&#x1F985; Eagle</span>
+        <span class="archetype-chip">&#x1F989; Owl</span>
+        <span class="archetype-chip">&#x1F42C; Dolphin</span>
+      </div>
+    </section>
+
+    <section aria-labelledby="about-title">
+      <h2 id="about-title" class="section-title">How this works</h2>
+      <!-- Bootstrap's grid (row/col) lays this out; hand-written CSS styles the cards -->
+      <div class="row g-3 info-grid-row">
+        <div class="col-md-4">
+          <div class="info-card">
+            <h3>1. Answer 15 questions</h3>
+            <p>Quick-fire questions about how you handle conflict, stress, weekends, and decision-making — no overthinking required.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="info-card">
+            <h3>2. Get your archetype</h3>
+            <p>Each answer scores a different animal. Whichever one you match most closely becomes your result — or you get a hybrid if it's close.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="info-card">
+            <h3>3. See the real facts</h3>
+            <p>Your result page pulls live characteristics for all six animals from a public Animals API, so you can compare your vibe to the real thing.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Pawsonality is built for entertainment and self-reflection — not a scientific personality assessment. <a href="faq.html">Read the FAQ</a>.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+</body>
+</html>
