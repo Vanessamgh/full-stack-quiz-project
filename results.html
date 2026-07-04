@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Your Result — Pawsonality</title>
+  <meta name="description" content="Your Pawsonality archetype result, with live facts pulled from a public Animals API." />
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header>
+    <nav class="site-nav">
+      <a href="index.html" class="brand">&#x1F43E; Pawsonality</a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="quiz.html">Take the Quiz</a>
+        <a href="faq.html">FAQ</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="page-wrap">
+    <!-- All three sections below are populated by the ResultsPage class (js/results.js) -->
+    <section id="resultHero" class="hero" aria-live="polite"></section>
+
+    <section id="scoreChart" aria-label="Full score breakdown"></section>
+
+    <section aria-labelledby="facts-title">
+      <h2 id="facts-title" class="section-title">Explore live animal facts</h2>
+      <p class="lead" style="text-align:left; margin:0 0 14px; font-size:0.92rem;">
+        Pulled live from the API Ninjas Animals API for all six archetypes. Search to filter
+        the cards below (this happens instantly in your browser — no extra requests).
+      </p>
+      <input
+        type="text"
+        id="factsSearch"
+        class="facts-search"
+        placeholder="Search archetypes… try &quot;owl&quot; or &quot;dolphin&quot;"
+        aria-label="Search archetype facts"
+      />
+      <!-- Bootstrap row/col grid — populated by ResultsPage.renderFactsGrid() -->
+      <div class="row g-3" id="factsGrid"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Pawsonality is built for entertainment and self-reflection — not a scientific personality assessment. <a href="faq.html">Read the FAQ</a>.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+  <script src="js/data.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/results.js"></script>
+</body>
+</html>
