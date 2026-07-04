@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FAQ — Pawsonality</title>
+  <meta name="description" content="Frequently asked questions about the Pawsonality animal personality quiz." />
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header>
+    <nav class="site-nav">
+      <a href="index.html" class="brand">&#x1F43E; Pawsonality</a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="quiz.html">Take the Quiz</a>
+        <a href="faq.html" class="active">FAQ</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="page-wrap">
+    <section class="faq-section" id="faq">
+      <div class="hero" style="padding-top:8px;">
+        <span class="hero-eyebrow">Before you scroll away confused</span>
+        <h1 style="font-size:clamp(1.8rem, 4vw, 2.4rem);">Frequently Overthought Questions</h1>
+        <p class="lead">Everything you didn't know you needed to ask about your results.</p>
+      </div>
+
+      <!-- Custom UI requirement: collapsible FAQ, driven by the Accordion class in js/accordion.js -->
+      <div class="faq-list" id="faqList"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Still curious? <a href="quiz.html">Take the quiz</a> and see for yourself.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+  <script src="js/accordion.js"></script>
+</body>
+</html>
