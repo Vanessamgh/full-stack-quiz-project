@@ -14,7 +14,17 @@ export async function POST(request) {
   const { neon } = await import("@neondatabase/serverless");
   const sql = neon(process.env.DATABASE_URL);
 
-  const [winnerId] = Object.entries(body.scores).sort((a, b) => b[1] - a[1])[0];
+  // A quiz can end in a tie between two (or more) archetypes — e.g. owl and
+  // dolphin both scoring 5. Find every archetype at the top score, not just
+  // whichever one Array.sort() happens to put first, and store all of them
+  // joined with "+" (e.g. "dolphin+owl") so hybrid results aren't silently
+  // collapsed into a single winner.
+  const topScore = Math.max(...Object.values(body.scores));
+  const winnerId = Object.entries(body.scores)
+    .filter(([, score]) => score === topScore)
+    .map(([id]) => id)
+    .sort()
+    .join("+");
 
   const [row] = await sql`
     INSERT INTO results (archetype, scores, visitor_id)

@@ -175,13 +175,22 @@ class Results extends Component {
               Your past results
             </h2>
             <ul className="result-facts">
-              {leaderboard.map((row, i) => (
-                <li key={i}>
-                  {ARCHETYPES[row.archetype]?.emoji} {ARCHETYPES[row.archetype]?.name || row.archetype}
-                  {" — "}
-                  {new Date(row.created_at).toLocaleString()}
-                </li>
-              ))}
+              {leaderboard.map((row, i) => {
+                // row.archetype may be a single id ("owl") or, on a tie,
+                // multiple ids joined with "+" ("dolphin+owl") — render
+                // every one instead of assuming there's only ever one winner.
+                const ids = row.archetype.split("+");
+                const label = ids
+                  .map((id) => `${ARCHETYPES[id]?.emoji ?? ""} ${ARCHETYPES[id]?.name ?? id}`.trim())
+                  .join(" + ");
+                return (
+                  <li key={i}>
+                    {label}
+                    {" — "}
+                    {new Date(row.created_at).toLocaleString()}
+                  </li>
+                );
+              })}
             </ul>
           </section>
         )}
