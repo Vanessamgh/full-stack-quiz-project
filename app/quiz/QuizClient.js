@@ -1,48 +1,62 @@
 "use client";
 
-import { useState } from "react";
+import { Component } from "react";
 import { useRouter } from "next/navigation";
 import { QUIZ_QUESTIONS } from "@/lib/data";
 import { getVisitorId } from "@/lib/visitor";
 
-export default function QuizClient() {
-  const router = useRouter();
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState([]);
-  const [saving, setSaving] = useState(false);
-
-  const question = QUIZ_QUESTIONS[currentIndex];
-  const selectedType = answers[currentIndex];
-  const isLast = currentIndex === QUIZ_QUESTIONS.length - 1;
-  const progressPercent = Math.round((currentIndex / QUIZ_QUESTIONS.length) * 100);
-
-  function selectOption(type) {
-    const next = [...answers];
-    next[currentIndex] = type;
-    setAnswers(next);
+/**
+ * Drives the 15-question quiz flow. Written as an ES6 class component so
+ * the quiz's state machine (current question, chosen answers, saving flag)
+ * lives on `this` rather than in hooks.
+ *
+ * Next.js's `useRouter()` is a hook and can only be called inside a function
+ * component, so this file exports a small function wrapper (`QuizClient`)
+ * that just grabs the router and hands it to the class as a `navigate` prop.
+ * All of the actual quiz logic below lives in the `Quiz` class.
+ */
+class Quiz extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      currentIndex: 0,
+      answers: [],
+      saving: false,
+    };
+    this.selectOption = this.selectOption.bind(this);
+    this.goBack = this.goBack.bind(this);
+    this.goNext = this.goNext.bind(this);
+    this.finish = this.finish.bind(this);
   }
 
-  function goBack() {
-    if (currentIndex === 0) return;
-    setCurrentIndex(currentIndex - 1);
+  selectOption(type) {
+    const next = [...this.state.answers];
+    next[this.state.currentIndex] = type;
+    this.setState({ answers: next });
   }
 
-  function goNext() {
-    if (!selectedType) return;
+  goBack() {
+    if (this.state.currentIndex === 0) return;
+    this.setState((prev) => ({ currentIndex: prev.currentIndex - 1 }));
+  }
+
+  goNext() {
+    const { currentIndex, answers } = this.state;
+    if (!answers[currentIndex]) return;
     if (currentIndex < QUIZ_QUESTIONS.length - 1) {
-      setCurrentIndex(currentIndex + 1);
+      this.setState({ currentIndex: currentIndex + 1 });
     } else {
-      finish();
+      this.finish();
     }
   }
 
-  async function finish() {
+  async finish() {
     const scores = { wolf: 0, cat: 0, dog: 0, eagle: 0, owl: 0, dolphin: 0 };
-    answers.forEach((type) => {
+    this.state.answers.forEach((type) => {
       if (type) scores[type]++;
     });
 
-    setSaving(true);
+    this.setState({ saving: true });
     try {
       await fetch("/api/results", {
         method: "POST",
@@ -56,49 +70,62 @@ export default function QuizClient() {
     }
 
     const params = new URLSearchParams(scores);
-    router.push(`/results?${params.toString()}`);
+    this.props.navigate(`/results?${params.toString()}`);
   }
 
-  return (
-    <div className="quiz-card" aria-live="polite">
-      <div className="quiz-progress">
-        <div className="quiz-progress-bar" style={{ width: `${progressPercent}%` }} />
-      </div>
-      <p className="quiz-step">
-        Question {currentIndex + 1} of {QUIZ_QUESTIONS.length}
-      </p>
-      <h2 className="quiz-question">{question.text}</h2>
-      <div className="quiz-options">
-        {question.options.map((opt) => (
+  render() {
+    const { currentIndex, answers, saving } = this.state;
+    const question = QUIZ_QUESTIONS[currentIndex];
+    const selectedType = answers[currentIndex];
+    const isLast = currentIndex === QUIZ_QUESTIONS.length - 1;
+    const progressPercent = Math.round((currentIndex / QUIZ_QUESTIONS.length) * 100);
+
+    return (
+      <div className="quiz-card" aria-live="polite">
+        <div className="quiz-progress">
+          <div className="quiz-progress-bar" style={{ width: `${progressPercent}%` }} />
+        </div>
+        <p className="quiz-step">
+          Question {currentIndex + 1} of {QUIZ_QUESTIONS.length}
+        </p>
+        <h2 className="quiz-question">{question.text}</h2>
+        <div className="quiz-options">
+          {question.options.map((opt) => (
+            <button
+              key={opt.type}
+              type="button"
+              className={`quiz-option${opt.type === selectedType ? " is-selected" : ""}`}
+              onClick={() => this.selectOption(opt.type)}
+            >
+              <span className="quiz-option-label">{opt.label}</span>
+              <span>{opt.text}</span>
+            </button>
+          ))}
+        </div>
+        <div className="quiz-nav">
           <button
-            key={opt.type}
             type="button"
-            className={`quiz-option${opt.type === selectedType ? " is-selected" : ""}`}
-            onClick={() => selectOption(opt.type)}
+            className="btn btn-ghost quiz-back"
+            disabled={currentIndex === 0}
+            onClick={this.goBack}
           >
-            <span className="quiz-option-label">{opt.label}</span>
-            <span>{opt.text}</span>
+            &larr; Back
           </button>
-        ))}
+          <button
+            type="button"
+            className="btn btn-primary quiz-next"
+            disabled={!selectedType || saving}
+            onClick={this.goNext}
+          >
+            {saving ? "Saving…" : isLast ? "See my result" : "Next"} &rarr;
+          </button>
+        </div>
       </div>
-      <div className="quiz-nav">
-        <button
-          type="button"
-          className="btn btn-ghost quiz-back"
-          disabled={currentIndex === 0}
-          onClick={goBack}
-        >
-          &larr; Back
-        </button>
-        <button
-          type="button"
-          className="btn btn-primary quiz-next"
-          disabled={!selectedType || saving}
-          onClick={goNext}
-        >
-          {saving ? "Saving…" : isLast ? "See my result" : "Next"} &rarr;
-        </button>
-      </div>
-    </div>
-  );
+    );
+  }
+}
+
+export default function QuizClient() {
+  const router = useRouter();
+  return <Quiz navigate={(path) => router.push(path)} />;
 }
