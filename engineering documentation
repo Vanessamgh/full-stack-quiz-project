@@ -1,0 +1,157 @@
+Repo: https://github.com/Vanessamgh/full-stack-quiz-project
+Live: https://full-stack-quiz-project.vercel.app
+Internal package name: vibecheck-next
+
+
+Note on sourcing: GitHub blocks automated crawling of its folder-tree
+pages, so this document was assembled from package.json, the repo root
+HTML files, and the JS files referenced by those pages. The contents of
+app/ and lib/ (the Next.js side of the project) could not be read
+directly — their role below is inferred from the dependency list and file
+naming, and is flagged as [inferred]. Anyone picking this up should
+open those two folders first and correct this doc.
+
+
+
+
+1. What this project is
+
+Pawsonality is a lighthearted 15-question personality quiz that maps a
+user's answers to one of six animal archetypes (Wolf, Cat, Dog, Eagle, Owl,
+Dolphin), then shows a results page with live trivia about each animal
+pulled from a third-party Animals API.
+
+Tagline from the homepage: "15 questions · 2 minutes · zero science."
+
+Pages:
+
+PagePurposeindex.htmlLanding page — pitch, "How this works" steps, CTA into the quizquiz.htmlRenders the 15 questions one at a time into #quizMount, no page reloadsresults.htmlShows the computed archetype, a score breakdown, and a searchable grid of live animal factsfaq.htmlStatic FAQ / disclaimer content
+
+
+2. Tech stack
+
+LayerTechnologyVersion (from package.json)Frontend pagesStatic HTML + vanilla JS (no framework)—CSSBootstrap (CDN) + hand-written css/style.css5.3.8App/backend layerNext.js (App Router — app/ directory)16.2.10UI runtime (Next side)React / React DOM19.2.4Database driver@neondatabase/serverless (serverless Postgres client for Neon)^1.1.0LintingESLint + eslint-config-next^9 / 16.2.10
+
+Two front ends coexist in this repo:
+
+
+A static, framework-free site at the repo root (index.html,
+quiz.html, results.html, faq.html, css/, js/) that does the
+actual quiz-taking experience client-side.
+A Next.js application in app/ with a lib/ support folder. Given
+the @neondatabase/serverless dependency, this layer's job is almost
+certainly server-side persistence — e.g. a leaderboard, saved results, or
+an API proxy in front of the third-party Animals API so the key isn't
+exposed client-side. [inferred — verify against app/ and lib/]
+
+
+If app/ turns out to be unused/scaffolding rather than wired into the
+static pages, that's worth flagging as tech debt — right now the repo reads
+as "static site quiz" + "separate Next/Neon skeleton" rather than one
+cleanly integrated app.
+
+
+3. Repository layout
+
+full-stack-quiz-project/
+├── app/                  # Next.js App Router — pages/layouts/API routes [contents unverified]
+├── lib/                  # Shared server-side helpers, likely incl. Neon DB client [unverified]
+├── public/               # Static assets served by Next.js [unverified]
+├── css/
+│   └── style.css         # Hand-written styles layered on top of Bootstrap
+├── js/
+│   ├── data.js            # Quiz question bank + archetype definitions
+│   ├── quiz.js             # `Quiz` class — renders questions into quiz.html, scores answers
+│   ├── api.js               # Client for the external Animals API (API Ninjas)
+│   └── results.js            # `ResultsPage` class — renders hero, score chart, facts grid
+├── index.html            # Landing page
+├── quiz.html              # Quiz-taking page
+├── results.html            # Results + live animal facts page
+├── faq.html                 # FAQ / disclaimer
+├── eslint.config.mjs
+├── jsconfig.json
+├── next.config.mjs
+├── package.json
+├── AGENTS.md              # Note for AI coding agents (see §6)
+└── CLAUDE.md              # `@AGENTS.md` — points Claude Code at the same file
+
+
+4. How the quiz flow works (client-side)
+
+
+index.html — marketing/landing page, links to quiz.html.
+quiz.html loads js/data.js (question + archetype data) and
+js/quiz.js. The Quiz class mounts into #quizMount and renders each
+of the 15 questions in place — the page comment confirms this is done
+without page reloads (a small client-side single-page flow inside a
+static HTML file, not React).
+On completion, the quiz presumably tallies per-archetype scores and
+redirects to results.html with the result encoded somehow (URL params
+or localStorage are the two idiomatic options for a vanilla-JS static
+site — not confirmed, check js/quiz.js).
+results.html loads js/data.js, js/api.js, and js/results.js.
+The ResultsPage class:
+
+Renders a hero section with the user's matched archetype
+(#resultHero).
+Renders a full score breakdown (#scoreChart).
+Renders a searchable grid of live facts for all six archetypes
+(#factsGrid), sourced from the API Ninjas Animals API via
+js/api.js. The search box (#factsSearch) filters client-side —
+the page explicitly notes this happens "in your browser — no extra
+requests," so all six animals' data is fetched once and cached in
+memory.
+
+
+
+
+
+
+5. Setup & local development
+
+bashgit clone https://github.com/Vanessamgh/full-stack-quiz-project.git
+cd full-stack-quiz-project
+npm install
+
+Scripts (from package.json):
+
+CommandEffectnpm run devnext dev — starts the Next.js side (App Router)npm run buildnext buildnpm run startnext start — production servernpm run linteslint
+
+To view the static quiz pages (index.html, quiz.html, etc.), you
+don't need Next.js at all — serve the repo root with any static server
+(e.g. npx serve .) and open index.html, since those pages use relative
+paths (css/style.css, js/data.js) and CDN-hosted Bootstrap.
+
+Environment variables (expected, unverified):
+Because @neondatabase/serverless is a dependency, a Neon connection
+string is almost certainly required for the Next.js side to run against a
+real database, conventionally:
+
+DATABASE_URL=postgres://...
+
+Check lib/ for the exact variable name(s) it reads before assuming this.
+If the results/leaderboard feature also calls API Ninjas server-side rather
+than client-side, an API key env var may be needed too — but as observed,
+js/api.js appears to call the Animals API directly from the browser, so
+that key (if any) is currently client-exposed. Worth confirming and, if
+true, worth moving behind a Next.js API route to avoid leaking the key.
+
+
+6. Notes for contributors (incl. AI coding agents)
+
+
+AGENTS.md explicitly warns: "This is NOT the Next.js you know" — the
+pinned version (16.2.10) is newer than most training data for AI
+assistants, and the repo instructs agents to read
+node_modules/next/dist/docs/ before writing Next.js code, since APIs,
+conventions, and file structure may differ from what's commonly assumed.
+Follow this — don't assume Next 13/14 App Router idioms apply
+unmodified.
+CLAUDE.md is a one-line pointer (@AGENTS.md) so Claude Code picks up
+the same guidance.
+There is no test suite, CI config, or .env.example in the repo root as
+currently observed — adding one for the Neon connection string would
+reduce onboarding friction.
+README.md is currently just the repo title (empty scaffold) — a good
+next contribution would be filling it in with a condensed version of
+§1–§5 above plus a live-demo link
