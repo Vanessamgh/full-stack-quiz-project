@@ -12,7 +12,7 @@ class ResultsPage {
     this.hasResult = Object.values(this.scores).some((v) => v > 0);
     this.winners = this.computeWinners();
     this.api = new AnimalApiService();
-    this.fetchedAnimals = {}; // archetypeId -> { status, data }
+    this.fetchedAnimals = {};
 
     if (!this.hasResult) {
       this.renderNoResult();
@@ -21,13 +21,10 @@ class ResultsPage {
 
     this.renderHero();
     this.renderScoreChart();
-    this.renderFactsGrid(true); // true = show loading skeletons first
+    this.renderFactsGrid(true);
     this.loadLiveData();
     this.bindSearch();
-    this.bindShare();
   }
-
-  // ---------- scoring ----------
 
   parseScores() {
     const params = new URLSearchParams(window.location.search);
@@ -44,8 +41,6 @@ class ResultsPage {
     return this.archetypeIds.filter((id) => this.scores[id] === max);
   }
 
-  // ---------- "took the quiz? no?" fallback ----------
-
   renderNoResult() {
     document.getElementById("resultHero").innerHTML = `
       <div class="no-result">
@@ -56,8 +51,6 @@ class ResultsPage {
       </div>
     `;
   }
-
-  // ---------- hero / reveal ----------
 
   renderHero() {
     const isHybrid = this.winners.length > 1;
@@ -89,14 +82,10 @@ class ResultsPage {
         ${allFacts.map((f) => `<li>${f}</li>`).join("")}
       </ul>
       <div class="result-actions">
-        <button class="btn btn-primary" id="shareBtn">Share my result</button>
         <a class="btn btn-ghost" href="quiz.html">Retake the quiz</a>
       </div>
-      <p class="share-copied" id="shareCopied" hidden>Link copied \u2014 go paste it somewhere fun.</p>
     `;
   }
-
-  // ---------- score breakdown chart ----------
 
   renderScoreChart() {
     const maxScore = Math.max(...Object.values(this.scores), 1);
@@ -123,12 +112,7 @@ class ResultsPage {
     `;
   }
 
-  // ---------- live API grid ----------
-
   renderFactsGrid(loading) {
-    // Bootstrap's grid system (row/col) handles the responsive layout here;
-    // hand-written CSS handles the card's own look. data-name lives on the
-    // Bootstrap column so filtering collapses the whole slot, not just the card.
     const container = document.getElementById("factsGrid");
 
     container.innerHTML = this.archetypeIds
@@ -190,7 +174,6 @@ class ResultsPage {
       return;
     }
 
-    // status === "error" (missing key, network, HTTP error)
     const hint =
       result.error === "MISSING_KEY"
         ? "Add your free API Ninjas key in js/api.js to unlock live data."
@@ -202,8 +185,6 @@ class ResultsPage {
     `;
   }
 
-  // ---------- client-side search over the already-fetched cards ----------
-
   bindSearch() {
     const input = document.getElementById("factsSearch");
     if (!input) return;
@@ -214,29 +195,6 @@ class ResultsPage {
         const matches = slot.dataset.name.includes(query);
         slot.hidden = query.length > 0 && !matches;
       });
-    });
-  }
-
-  // ---------- share ----------
-
-  bindShare() {
-    const btn = document.getElementById("shareBtn");
-    if (!btn) return;
-
-    btn.addEventListener("click", async () => {
-      const url = window.location.href;
-      if (navigator.share) {
-        navigator.share({ title: "My Pawsonality result", url }).catch(() => {});
-        return;
-      }
-      try {
-        await navigator.clipboard.writeText(url);
-        const note = document.getElementById("shareCopied");
-        note.hidden = false;
-        setTimeout(() => (note.hidden = true), 2500);
-      } catch {
-        window.prompt("Copy your result link:", url);
-      }
     });
   }
 }
