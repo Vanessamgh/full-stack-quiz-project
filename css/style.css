@@ -304,6 +304,31 @@ img {
   font-size: 0.85rem;
 }
 
+.quiz-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 28px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.quiz-next:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.quiz-back:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.quiz-option.is-selected {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
 /* ---------- results page ---------- */
 
 .no-result {
